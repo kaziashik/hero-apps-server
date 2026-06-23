@@ -49,9 +49,9 @@ const appsCollection = database.collection("apps");
 
 app.get("/apps", async (req, res) => {
   try {
-    console.log("check query",req.query);
+    // console.log("check query",req.query);
     const {limit=0,skip=0}=req.query;
-    console.log(limit);
+    // console.log(limit);
     const apps = await appsCollection.find()
     .limit(Number(limit))
     .skip(Number(skip))
