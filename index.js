@@ -49,28 +49,36 @@ const appsCollection = database.collection("apps");
 
 app.get("/apps", async (req, res) => {
   try {
-    console.log("check query",req.query);
-    const {limit=0,skip=0, sort="size",order="desc"}=req.query;
-    console.log(limit,sort,order);
+    // console.log("check query",req.query);
+    const { limit = 0, skip = 0, sort = "size", order = "desc", search = "", } = req.query;
+    console.log(limit, sort, order, search);
 
-    const sortOption={};
-    sortOption[sort || "size"]=order ==="asc" ? 1 : -1;
 
-     console.log(sortOption);
-
+    const query = {};
+    if (search) {
+      query.title = { $regex: search, $options: "i" };
+    }
     
+    console.log("query", query);
+
+    const sortOption = {};
+    sortOption[sort || "size"] = order === "asc" ? 1 : -1;
+
+    console.log(sortOption);
+
+
     const apps = await appsCollection
-    .find()
-    .sort(sortOption)
-    .limit(Number(limit))
-    .skip(Number(skip))
-    .project({ description: 0, rating: 0 })
-    .toArray();
+      .find(query)
+      .sort(sortOption)
+      .limit(Number(limit))
+      .skip(Number(skip))
+      .project({ description: 0, rating: 0 })
+      .toArray();
 
-    const count =await appsCollection.countDocuments();
+    const count = await appsCollection.countDocuments(query);
 
 
-    res.send({apps,total:count});
+    res.send({ apps, total: count });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
